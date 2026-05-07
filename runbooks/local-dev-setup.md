@@ -16,7 +16,7 @@ This runbook covers setting up the gemini-cli workspace template on a local mach
 ## Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/molecule-ai/molecule-ai-workspace-template-gemini-cli.git
+git clone https://git.moleculesai.app/molecule-ai/molecule-ai-workspace-template-gemini-cli.git
 cd molecule-ai-workspace-template-gemini-cli
 ```
 
