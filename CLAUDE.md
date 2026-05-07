@@ -144,7 +144,7 @@ The skill directories must be volume-mounted or present in the image.
 
 ```bash
 # 1. Clone
-git clone https://github.com/molecule-ai/molecule-ai-workspace-template-gemini-cli.git
+git clone https://git.moleculesai.app/molecule-ai/molecule-ai-workspace-template-gemini-cli.git
 cd molecule-ai-workspace-template-gemini-cli
 
 # 2. Install dependencies
