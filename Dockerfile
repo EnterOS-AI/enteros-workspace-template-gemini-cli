@@ -36,4 +36,16 @@ COPY cli_executor.py .
 
 ENV ADAPTER_MODULE=adapter
 
-ENTRYPOINT ["molecule-runtime"]
+# Drop-priv entrypoint — per-template privilege contract
+# (RFC internal#456). Without this, molecule-runtime ran as ROOT and the
+# untrusted agent workload had root capabilities in-container. The
+# entrypoint runs as root only long enough to chown /configs to
+# agent:agent (so /configs/.auth_token stays agent-readable when the
+# runtime writes it in SaaS mode) then re-execs the runtime via
+# `gosu agent` so the final process is uid-1000. Both halves are atomic
+# — dropping privilege without the chown would regress list_peers to
+# the Hermes 401 class.
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
