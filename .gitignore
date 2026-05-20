@@ -19,3 +19,7 @@
 # Workspace auth tokens
 .auth-token
 .auth_token
+
+# Python build / test artifacts
+__pycache__/
+*.pyc

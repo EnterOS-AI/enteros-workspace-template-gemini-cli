@@ -46,6 +46,7 @@ from molecule_runtime.executor_helpers import (
     brief_summary,
     classify_subprocess_error,
     commit_memory,
+    extract_attached_files,
     extract_message_text,
     get_a2a_instructions,
     get_mcp_server_path,
@@ -273,10 +274,31 @@ class CLIAgentExecutor(AgentExecutor):
 
     async def execute(self, context: RequestContext, event_queue: EventQueue):
         """Execute a task by invoking the CLI agent."""
-        user_input = extract_message_text(context.message)
-        if not user_input:
+        user_input = extract_message_text(context.message) or ""
+        # Phase 1 file-only message support (a1ea2200 archaeology —
+        # chloe-dong PDF-only canary 2026-05-20 01:04:27Z surfaced the
+        # opaque "Error: message contained no text content." reply on
+        # this code path). Mirror the claude-code reference impl
+        # (claude_sdk_executor.py:644-650): surface attached files to
+        # the CLI agent as a manifest in the prompt — gemini-cli /
+        # ollama / friends read files through their own tools by path.
+        # Phase 2 will wire actual file-content forwarding via the
+        # underlying CLI's own attachment flags (where supported).
+        attached = extract_attached_files(context.message)
+        if attached:
+            manifest = "\n\nAttached files:\n" + "\n".join(
+                f"- {f['name']} ({f['mime_type'] or 'unknown type'}) at {f['path']}"
+                for f in attached
+            )
+            user_input = (user_input + manifest) if user_input.strip() else manifest.lstrip()
+        if not user_input.strip():
+            # Truly empty — actionable per
+            # feedback_surface_actionable_failure_reason_to_user.
             await event_queue.enqueue_event(
-                new_agent_text_message("Error: message contained no text content.")
+                new_agent_text_message(
+                    "Your message was empty. Please send text or a file "
+                    "with instructions."
+                )
             )
             return
 
