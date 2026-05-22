@@ -10,10 +10,12 @@ name: publish-image
 # (feedback_gitea_cross_repo_uses_blocked)
 #
 # Registry: production uses ECR (MOLECULE_IMAGE_REGISTRY env var on EC2 /
-# Railway) backed by org-level AWS creds. The OSS default in registry.go is
-# ghcr.io/molecule-ai but the ECR repo `molecule-ai/workspace-template-gemini-cli`
-# already exists (created by the migration sweep). No GHCR token is in the
-# credentials store — Gitea's GITHUB_TOKEN cannot authenticate to ghcr.io.
+# Railway). Gitea Actions receives repo-scoped AWS ECR credentials synced from
+# the central key-management path; do not hand-enter or paste those values.
+# The OSS default in registry.go is ghcr.io/molecule-ai but the ECR repo
+# `molecule-ai/workspace-template-gemini-cli` already exists (created by the
+# migration sweep). No GHCR token is in the credentials store — Gitea's
+# GITHUB_TOKEN cannot authenticate to ghcr.io.
 #
 # Gitea 1.22.6 hostile-shape checklist applied:
 #   - No workflow_dispatch.inputs (silently rejected on 1.22.6)
