@@ -35,8 +35,8 @@ from pathlib import Path
 
 from a2a.server.agent_execution import AgentExecutor, RequestContext
 from a2a.server.events import EventQueue
-# KI-009: a2a-sdk v1 renames a2a.utils → a2a.helpers
-from a2a.helpers import new_agent_text_message
+# KI-009: a2a-sdk v1 renames the old agent-text helper to new_text_message.
+from a2a.helpers import new_text_message as new_agent_text_message
 
 from molecule_runtime.config import RuntimeConfig
 from molecule_runtime.executor_helpers import (

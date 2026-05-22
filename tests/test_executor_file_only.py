@@ -29,19 +29,6 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-# Compat shim: cli_executor.py imports ``new_agent_text_message`` from
-# ``a2a.helpers`` but a2a-sdk 1.x (KI-009 migration — what the runtime
-# wheel pins via ``a2a-sdk[http-server]<2.0,>=1.0.0``) ships only
-# ``new_text_message``. The symbol was renamed. That's a pre-existing
-# runtime bug separate from Phase 1's empty-prompt guard fix; aliasing
-# here keeps THIS test file importable without rewriting all 7 call
-# sites under unrelated PR scope.
-try:
-    from a2a.helpers import new_agent_text_message  # noqa: F401
-except ImportError:
-    from a2a import helpers as _a2a_helpers
-    _a2a_helpers.new_agent_text_message = _a2a_helpers.new_text_message
-
 from types import SimpleNamespace
 from typing import Any
 from unittest.mock import patch
