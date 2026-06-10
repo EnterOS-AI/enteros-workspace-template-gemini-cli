@@ -17,10 +17,26 @@ WORKDIR /app
 # fix for the cascade cache trap that bit us 5x on 2026-04-27.
 ARG RUNTIME_VERSION=
 
+# Gitea PyPI registry is the PRIMARY internal index (RFC internal#596; CTO GO
+# 2026-05-19). It serves the private molecule-ai-workspace-runtime wheel,
+# including versions that are Gitea-only (e.g. 0.2.x / 0.3.x). Anonymous reads
+# work because molecule-ai is a public org -- no auth wired into the build.
+# pypi.org stays as the extra index for transitive deps that are PyPI-only.
+# Without the Gitea index, a cascade-pinned RUNTIME_VERSION newer than what is
+# mirrored to public PyPI (max 0.1.131) fails to resolve and the build dies.
+ARG PIP_INDEX_URL=https://git.moleculesai.app/api/packages/molecule-ai/pypi/simple/
+ARG PIP_EXTRA_INDEX_URL=https://pypi.org/simple/
+
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt && \
+RUN pip install --no-cache-dir \
+      --index-url "${PIP_INDEX_URL}" \
+      --extra-index-url "${PIP_EXTRA_INDEX_URL}" \
+      -r requirements.txt && \
     if [ -n "${RUNTIME_VERSION}" ]; then \
-      pip install --no-cache-dir --upgrade "molecule-ai-workspace-runtime==${RUNTIME_VERSION}"; \
+      pip install --no-cache-dir --upgrade \
+        --index-url "${PIP_INDEX_URL}" \
+        --extra-index-url "${PIP_EXTRA_INDEX_URL}" \
+        "molecule-ai-workspace-runtime==${RUNTIME_VERSION}"; \
     fi
 
 COPY adapter.py .
