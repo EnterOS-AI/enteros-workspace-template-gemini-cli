@@ -1,5 +1,10 @@
-# Molecule AI workspace runtime — shared infrastructure
-molecule-ai-workspace-runtime>=0.1.0
+# Molecule AI workspace runtime — shared infrastructure.
+# Pin the CURRENT dist name (molecules-workspace-runtime) at the version
+# declared in .runtime-version. The legacy name molecule-ai-workspace-runtime
+# no longer resolves on any index (private Gitea publishes molecules-workspace-runtime;
+# the legacy name is absent from public PyPI), so the old floor pin made
+# `pip install -r requirements.txt` — hence CI / validate (validate-runtime) — fail.
+molecules-workspace-runtime==0.3.72
 
 # gemini-cli adapter has no extra Python dependencies.
 # The CLIAgentExecutor (base) handles all subprocess management.

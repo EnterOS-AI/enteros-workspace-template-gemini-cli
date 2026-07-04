@@ -2,4 +2,10 @@ name: CI
 on: [push, pull_request]
 jobs:
   validate:
-    uses: molecule-ai/molecule-ci/.gitea/workflows/validate-workspace-template.yml@main
+    # SHA-pinned (not @main): the self-hosted robot-1 runner pool caches reusables
+    # by ref and reuses a stale @main checkout that predates the reusable's
+    # `pip install jsonschema` step, so validate-workspace-template.py aborts with
+    # "jsonschema not installed" on both validate-static and validate-runtime. A
+    # SHA pin forces a fresh fetch (same fix as molecule-cli's minimal-ci). Bump
+    # this SHA when intentionally adopting new validator behavior.
+    uses: molecule-ai/molecule-ci/.gitea/workflows/validate-workspace-template.yml@466f4faba636e52861bf5058f64e331352be1a65
